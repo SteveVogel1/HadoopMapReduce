@@ -17,9 +17,10 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.partition.HashPartitioner;
+import org.apache.hadoop.mapreduce.lib.partition.BinaryPartitioner;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-
+import org.apache.hadoop.mapreduce.Partitioner;
 import java.io.IOException;
 
 public class Verkaufsanalyse extends Configured implements Tool {
@@ -41,12 +42,12 @@ public class Verkaufsanalyse extends Configured implements Tool {
 		job.setMapOutputKeyClass(LongWritable.class);
 		job.setMapOutputValueClass(DoubleWritable.class);
 
-		job.setPartitionerClass(HashPartitioner.class);
+		job.setPartitionerClass(CustomPartitioner.class);
 
-		job.setNumReduceTasks(4);
+		job.setNumReduceTasks(8);
 		job.setReducerClass(AnalyseReducer.class);
 
-		job.setOutputKeyClass(LongWritable.class);
+		job.setOutputKeyClass(CustomLongWritable.class);
 		job.setOutputValueClass(Text.class);
 
 		job.setOutputFormatClass(TextOutputFormat.class);
@@ -72,7 +73,30 @@ public class Verkaufsanalyse extends Configured implements Tool {
 		}
 	}
 
-	public static class AnalyseReducer extends Reducer<LongWritable, DoubleWritable, LongWritable, Text> {
+	public static class CustomLongWritable extends LongWritable {
+
+		public CustomLongWritable(long value) {
+			super(value);
+		}
+
+		@Override
+		public String toString() {
+			return "Stunde: " + get();
+		}
+
+	}
+
+	public static class CustomPartitioner extends Partitioner<LongWritable, DoubleWritable> {
+		@Override
+		public int getPartition(LongWritable key, DoubleWritable value, int numPartitions) {
+			// find smart way to partition
+			long tmp = key.get();
+			int otherTmp = 16 / (int)numPartitions;
+			return ((int)tmp / otherTmp)-1 < 0 ? 0 : ((int)tmp / otherTmp)-1;
+		}
+	}
+
+	public static class AnalyseReducer extends Reducer<LongWritable, DoubleWritable, CustomLongWritable, Text> {
 		
 		@Override
 		public void reduce(LongWritable key, Iterable<DoubleWritable> values, Context context)
@@ -85,10 +109,9 @@ public class Verkaufsanalyse extends Configured implements Tool {
 				count++;
 			}
 			avg /= count;
-			Text t = new Text(avg + "");
+			Text t = new Text(String.format("%.4f", avg) + " Bananen");
 			
-			context.write (key, t);
-			
+			context.write(new CustomLongWritable(key.get()), t);
 		}
 	}	
 
