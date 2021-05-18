@@ -89,10 +89,11 @@ public class Verkaufsanalyse extends Configured implements Tool {
 	public static class CustomPartitioner extends Partitioner<LongWritable, DoubleWritable> {
 		@Override
 		public int getPartition(LongWritable key, DoubleWritable value, int numPartitions) {
-			// find smart way to partition
-			long tmp = key.get();
-			int otherTmp = 16 / (int)numPartitions;
-			return ((int)tmp / otherTmp)-1 < 0 ? 0 : ((int)tmp / otherTmp)-1;
+            // We assume all purchases are between 6 and 20
+            // if we subtract 6, the max value is 14
+            int keySubtracted = (int) key.get() - 6;
+			int keyPerPartition = (int) Math.ceil(14 / (double) numPartitions);
+			return (int) (keySubtracted / keyPerPartition);
 		}
 	}
 
