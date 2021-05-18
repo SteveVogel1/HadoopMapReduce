@@ -44,7 +44,7 @@ public class Verkaufsanalyse extends Configured implements Tool {
 
 		job.setPartitionerClass(CustomPartitioner.class);
 
-		job.setNumReduceTasks(8);
+		job.setNumReduceTasks(4);
 		job.setReducerClass(AnalyseReducer.class);
 
 		job.setOutputKeyClass(CustomLongWritable.class);
