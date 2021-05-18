@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+    hadoop:
+        build:
+            context: ./
+        container_name: my-hadoop
+        volumes:
+            - ./code/:/home/ddm/src/code
