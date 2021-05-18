@@ -1,4 +1,4 @@
-package team1MapReduce;
+package myMiniMapRed;
 
 //== MinimalMapReduceExt: The simplest possible MapReduce driver, which shows the defaults and uses own Mapper and Reducer
 
@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
 
-public class Verkaufsanalyse extends Configured implements Tool {
+public class VerkaufsAnalyseMapReduceExt extends Configured implements Tool {
 
 	@Override
 	public int run(String[] args) throws Exception {
@@ -31,18 +31,20 @@ public class Verkaufsanalyse extends Configured implements Tool {
 			return -1;
 
 		}
+
+
 		Job job = Job.getInstance(getConf(), "minimapredext");
 		job.setJarByClass(this.getClass());
 
 		job.setInputFormatClass(TextInputFormat.class);
-		job.setMapperClass(MyMapper.class);
+		job.setMapperClass(AnalyseMapper.class);
 		job.setMapOutputKeyClass(LongWritable.class);
-		job.setMapOutputValueClass(Text.class);
+		job.setMapOutputValueClass(DoubleWritable.class);
 
 		job.setPartitionerClass(HashPartitioner.class);
 
 		job.setNumReduceTasks(1);
-		job.setReducerClass(MyReducer.class);
+		job.setReducerClass(AnalyseReducer.class);
 
 		job.setOutputKeyClass(LongWritable.class);
 		job.setOutputValueClass(Text.class);
@@ -54,31 +56,32 @@ public class Verkaufsanalyse extends Configured implements Tool {
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
 
-	public static class MyMapper extends Mapper<LongWritable, Text, LongWritable, Text> {
+	public static class AnalyseMapper extends Mapper<LongWritable, Text, LongWritable, DoubleWritable> {
 
 		@Override
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			/*
-			 * TODO implement
-			 */
-			context.write (key, value);
+			Strting[] arr = value.split("\t")
+			String[] time = arr[1].split(":")
+
+			LongWritable k = time[0]
+
+			DoubleWritable val = arr[3]
+			context.write (k, val);
 		}
 	}
 
-	public static class MyReducer extends Reducer<LongWritable, Text, LongWritable, Text> {
+	public static class AnalyseReducer extends Reducer<LongWritable, Text, LongWritable, Text> {
 
 		@Override
-		public void reduce(LongWritable key, Iterable<Text> values, Context context)
+		public void reduce(LongWritable key, Iterable<DoubleWritable> values, Context context)
 				throws IOException, InterruptedException {
 
-			/*
-			 * TODO implement
-			 */
-			for (Text val : values){
-				context.write (key, new Text(val));
-			}
+			Text t = val.stream().average()
+			
+			context.write (key, new Text(t));
+			
 		}
 	}	
 
