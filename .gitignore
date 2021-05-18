@@ -1,2 +1,4 @@
 purchases.txt
 .ipynb_checkpoints/
+*.jar
+*.class

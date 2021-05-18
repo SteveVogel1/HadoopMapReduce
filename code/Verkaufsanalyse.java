@@ -1,4 +1,4 @@
-package myMiniMapRed;
+package team1MapReduce;
 
 //== MinimalMapReduceExt: The simplest possible MapReduce driver, which shows the defaults and uses own Mapper and Reducer
 
@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 //== these imports are new
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -21,7 +22,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
 
-public class VerkaufsAnalyseMapReduceExt extends Configured implements Tool {
+public class Verkaufsanalyse extends Configured implements Tool {
 
 	@Override
 	public int run(String[] args) throws Exception {
@@ -31,7 +32,6 @@ public class VerkaufsAnalyseMapReduceExt extends Configured implements Tool {
 			return -1;
 
 		}
-
 
 		Job job = Job.getInstance(getConf(), "minimapredext");
 		job.setJarByClass(this.getClass());
@@ -43,7 +43,7 @@ public class VerkaufsAnalyseMapReduceExt extends Configured implements Tool {
 
 		job.setPartitionerClass(HashPartitioner.class);
 
-		job.setNumReduceTasks(1);
+		job.setNumReduceTasks(4);
 		job.setReducerClass(AnalyseReducer.class);
 
 		job.setOutputKeyClass(LongWritable.class);
@@ -62,31 +62,38 @@ public class VerkaufsAnalyseMapReduceExt extends Configured implements Tool {
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			Strting[] arr = value.split("\t")
-			String[] time = arr[1].split(":")
+			String[] arr = value.toString().split("\t");
+			String[] time = arr[1].split(":");
 
-			LongWritable k = time[0]
+			LongWritable k = new LongWritable(Long.parseLong(time[0]));
 
-			DoubleWritable val = arr[3]
+			DoubleWritable val = new DoubleWritable(Double.parseDouble(arr[4]));
 			context.write (k, val);
 		}
 	}
 
-	public static class AnalyseReducer extends Reducer<LongWritable, Text, LongWritable, Text> {
-
+	public static class AnalyseReducer extends Reducer<LongWritable, DoubleWritable, LongWritable, Text> {
+		
 		@Override
 		public void reduce(LongWritable key, Iterable<DoubleWritable> values, Context context)
 				throws IOException, InterruptedException {
-
-			Text t = val.stream().average()
 			
-			context.write (key, new Text(t));
+			double avg = 0;
+			int count = 0;
+			for(DoubleWritable i : values) {
+				avg += i.get();
+				count++;
+			}
+			avg /= count;
+			Text t = new Text(avg + "");
+			
+			context.write (key, t);
 			
 		}
 	}	
 
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new  MinimalMapReduceExt(), args);
+		int res = ToolRunner.run(new  Verkaufsanalyse(), args);
 		System.exit(res);
 	}
 }
