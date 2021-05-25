@@ -11,6 +11,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 //== these imports are new
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -20,6 +21,8 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
 public class UmsatzRanking_2 extends Configured implements Tool {
 
@@ -36,16 +39,15 @@ public class UmsatzRanking_2 extends Configured implements Tool {
 
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setMapperClass(MyMapper.class);
-		job.setMapOutputKeyClass(LongWritable.class);
-		job.setMapOutputValueClass(Text.class);
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(DoubleWritable.class);
 
 		job.setPartitionerClass(HashPartitioner.class);
 
-		job.setNumReduceTasks(1);
-		job.setReducerClass(MyReducer.class);
+		job.setNumReduceTasks(0);
 
-		job.setOutputKeyClass(LongWritable.class);
-		job.setOutputValueClass(Text.class);
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(DoubleWritable.class);
 
 		job.setOutputFormatClass(TextOutputFormat.class);
 
@@ -54,36 +56,45 @@ public class UmsatzRanking_2 extends Configured implements Tool {
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
 
-	public static class MyMapper extends Mapper<LongWritable, Text, LongWritable, Text> {
+	public static class MyMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
 
+		private TreeMap<Double, String> tmap;
+	
 		@Override
-		public void map(LongWritable key, Text value, Context context)
-				throws IOException, InterruptedException {
+		public void setup(Context context) throws IOException, InterruptedException
+		{
+			tmap = new TreeMap<Double, String>(Collections.reverseOrder());
+		}
+	
+		@Override
+		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
+		{
+			String[] tokens = value.toString().split("\t");
+			String store = tokens[0];
+			double revenue = Double.parseDouble(tokens[1]);
+	
+			tmap.put(revenue, store);
 
-			/*
-			 * TODO implement
-			 */
-			context.write (key, value);
+			if (tmap.size() > 10)
+			{
+				tmap.remove(tmap.lastKey());
+			}
+		}
+	
+		@Override
+		public void cleanup(Context context) throws IOException, InterruptedException
+		{
+			for (Map.Entry<Double, String> entry : tmap.entrySet()) 
+			{
+				double revenue = entry.getKey();
+				String store = entry.getValue();
+				context.write(new Text(store), new DoubleWritable(revenue));
+			}
 		}
 	}
 
-	public static class MyReducer extends Reducer<LongWritable, Text, LongWritable, Text> {
-
-		@Override
-		public void reduce(LongWritable key, Iterable<Text> values, Context context)
-				throws IOException, InterruptedException {
-
-			/*
-			 * TODO implement
-			 */
-			for (Text val : values){
-				context.write (key, new Text(val));
-			}
-		}
-	}	
-
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new  MinimalMapReduceExt(), args);
+		int res = ToolRunner.run(new UmsatzRanking_2(), args);
 		System.exit(res);
 	}
 }

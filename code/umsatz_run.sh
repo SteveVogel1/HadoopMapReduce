@@ -1,6 +1,8 @@
 #!/bin/sh
 
-javac -classpath ${HADOOP_CLASSPATH} src/GroupByUmsatz_1.java -d build
+mkdir build
+
+javac -classpath ${HADOOP_CLASSPATH} GroupByUmsatz_1.java -d build
 jar -cvf team1MapReduce.jar -C build .
 
 $HADOOP_PREFIX/bin/hdfs dfs -rm -r map-reduce-assignment/output/GroupByUmsatz_1

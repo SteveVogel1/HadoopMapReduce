@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 //== these imports are new
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -36,16 +37,16 @@ public class GroupByUmsatz_1 extends Configured implements Tool {
 
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setMapperClass(MyMapper.class);
-		job.setMapOutputKeyClass(LongWritable.class);
-		job.setMapOutputValueClass(Text.class);
+		job.setMapOutputKeyClass(Text.class);
+		job.setMapOutputValueClass(DoubleWritable.class);
 
 		job.setPartitionerClass(HashPartitioner.class);
 
 		job.setNumReduceTasks(1);
 		job.setReducerClass(MyReducer.class);
 
-		job.setOutputKeyClass(LongWritable.class);
-		job.setOutputValueClass(Text.class);
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(DoubleWritable.class);
 
 		job.setOutputFormatClass(TextOutputFormat.class);
 
@@ -54,36 +55,41 @@ public class GroupByUmsatz_1 extends Configured implements Tool {
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
 
-	public static class MyMapper extends Mapper<LongWritable, Text, LongWritable, Text> {
+	public static class MyMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
 
 		@Override
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			/*
-			 * TODO implement
-			 */
-			context.write (key, value);
+	
+			String[] arr = value.toString().split("\t");
+			String store = arr[2].trim();
+
+			DoubleWritable val = new DoubleWritable(Double.parseDouble(arr[4]));
+			context.write (new Text(store), val);
 		}
 	}
 
-	public static class MyReducer extends Reducer<LongWritable, Text, LongWritable, Text> {
+	public static class MyReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+
+		double sum = 0;
+		DoubleWritable result = new DoubleWritable();
 
 		@Override
-		public void reduce(LongWritable key, Iterable<Text> values, Context context)
-				throws IOException, InterruptedException {
+		public void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
 
-			/*
-			 * TODO implement
-			 */
-			for (Text val : values){
-				context.write (key, new Text(val));
+			for (DoubleWritable val : values){
+				sum += val.get();
 			}
+
+			result.set(sum);
+     		context.write(key, result);
+			sum = 0;
 		}
-	}	
+	}
 
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new  MinimalMapReduceExt(), args);
+		int res = ToolRunner.run(new GroupByUmsatz_1(), args);
 		System.exit(res);
 	}
 }
