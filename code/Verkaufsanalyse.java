@@ -110,7 +110,7 @@ public class Verkaufsanalyse extends Configured implements Tool {
 				count++;
 			}
 			avg /= count;
-			Text t = new Text(String.format("%.4f", avg) + " Bananen");
+			Text t = new Text(String.format("%.4f", avg) + " CHF");
 			
 			context.write(new CustomLongWritable(key.get()), t);
 		}

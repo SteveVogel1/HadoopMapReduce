@@ -1,21 +1,21 @@
 # HadoopMapReduce
 
 
-# Aufgabe 1: Verkaufsanalyse
+## Aufgabe 1: Verkaufsanalyse
 
-**Verarbeitung Inputdatei**
+### Verarbeitung Inputdatei
 
 Die Map Funktion wird für jede Zeile aufgerufen. Die Zeile wird dann anhand von Tabulator-Zeichen aufgetrennt. Die Zeit ist dabei der 2. Wert (im Array der Werte der Zeile). Die Zeit wird danach anhand des : (Doppelpunkts) aufgetrennt und anschliessend wird die Stunde in ein Long umgewandelt.
 Auch der Betrag wird nach selbem Vorgehen extrahiert und in ein Double umgewandelt.
 
-**Output Map Funktion
+### Output Map Funktion
 
 Die Ausgabe der Map-Funktion ist ein Key-Value-Pair für jede Textzeile:
 
 * Die Stunde als Key (LongWritable)
 * Der Betrag als Value (DoubleWritable)
 
-** Reduce Funktion **
+### Reduce Funktion
 
 Die Reduce Funktion summiert alle Beträge derselben Stunde auf und berechnet damit den Durchschnitts Einkaufsbetrag.
 Ausgabe der Reduce Funktion ist folgendes Key-Value-Pair:
@@ -25,7 +25,8 @@ Ausgabe der Reduce Funktion ist folgendes Key-Value-Pair:
 
 `CustomLongWritable` ist eine Subklasse von `LongWritable` und überschreibt die `toString` Methode. So können wir nicht nur X für die Stunde sondern auch noch ein Label ausgeben.
 
-** CustomPartitioner **
+### CustomPartitioner
+
 Bei der Verwendung von mehreren Reducern ist uns aufgefallen, dass die Ausgabe dann nicht mehr sortiert ist. Wir haben herausgefunden, dass pro Reducer am Schluss eine Datei erstellt wird. Die Werte sind zwar innerhalb der Datei sortiert, aber nicht über mehrere Dateien hinweg. Der verwendete `HashPartitioner` stellt sich als Problem heraus. Deshalb haben wir einen eigenen Partition `CustomPartitioner` erstellt. Dieser weist der ersten Partition die tiefsten Keys (Stunden) zu und dem letzten Partitioner die grössten. So ist am Ende die Ausgabe wieder aufsteigend nach Stunden sortiert.
 Die Funktion für das Berechnen, an welche Partition ein Key hinzugewiesen wird, hat aber einige kleine Nachteile:
 
@@ -33,4 +34,16 @@ Die Funktion für das Berechnen, an welche Partition ein Key hinzugewiesen wird,
 
 Die könnte man natürlich auch noch nachträglich beheben in dem man die Textdateien z.B. mit Commandlinetools sortiert.
 
-<span style="background:yellow;">TODO Auszug Ausgabe</span>
+### Auszug Ausgabe (alle Dateien konkateniert)
+
+```
+Stunde: 9       249.6722 CHF
+Stunde: 10      250.0561 CHF
+Stunde: 11      249.9281 CHF
+Stunde: 12      249.8554 CHF
+Stunde: 13      250.2583 CHF
+Stunde: 14      249.8221 CHF
+Stunde: 15      250.0731 CHF
+Stunde: 16      250.2437 CHF
+Stunde: 17      249.7406 CHF
+```
