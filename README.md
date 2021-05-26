@@ -280,3 +280,8 @@ __Resultate der Aufgabe 1__
 
 __Resultate der Aufgabe 2__  
 ![Verkaufsanalyse.png](./images/UmsatzRanking.png)
+
+
+### Source Code Beider Programme
+
+<a href="./code/purchases analysis.ipynb">Quellcode Code Jupyter Notebook - purchases analysis.ipynb</a>
