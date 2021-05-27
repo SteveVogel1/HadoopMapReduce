@@ -76,15 +76,15 @@ Die könnte man natürlich auch noch nachträglich beheben in dem man die Textda
 ### Auszug Ausgabe (alle Dateien konkateniert)
 
 ```
-Stunde: 9       249.6722 CHF
-Stunde: 10      250.0561 CHF
-Stunde: 11      249.9281 CHF
-Stunde: 12      249.8554 CHF
-Stunde: 13      250.2583 CHF
-Stunde: 14      249.8221 CHF
-Stunde: 15      250.0731 CHF
-Stunde: 16      250.2437 CHF
-Stunde: 17      249.7406 CHF
+Stunde: 9       249.67
+Stunde: 10      250.06
+Stunde: 11      249.93
+Stunde: 12      249.86
+Stunde: 13      250.26
+Stunde: 14      249.82
+Stunde: 15      250.07
+Stunde: 16      250.24
+Stunde: 17      249.74
 ```
 
 Aus der obigen Ausgabe kann man keinen Zusammenhang zwischen Stunde und Betrag ermitteln, da sich der minimale und maximale Betrag keine 60 Rp. unterscheiden.  
@@ -120,22 +120,24 @@ Die `reduce` Funktion summiert pro Key die einzelnen Preise auf.
 #### Auszug Ausgabe (Formatiert)
 Ausgabe aller Umsätze pro Filiale.  
 ```
-Albuquerque         1.005231142000009E7
-Anaheim             1.007641635999986E7
-Anchorage           9933500.400000038
-Arlington           1.0072207970000017E7
-Atlanta             9997146.700000007
-Aurora              9992970.920000033
-Austin              1.005715890000006E7
-Bakersfield         1.0031208919999892E7
-Baltimore           1.0096521450000046E7
-Baton Rouge         1.0131273230000045E7
-Birmingham          1.007660652000002E7
-Boise               1.003916673999995E7
-Boston              1.0039473279999984E7
-Buffalo             1.0001941189999972E7
-Chandler            9919559.859999971
-Charlotte           1.0112531340000011E7
+Anaheim 1.007641635999996E7
+Buffalo 1.0001941190000031E7
+Chandler    9919559.860000001
+Colorado Springs    1.0061105870000025E7
+Dallas  1.0066548450000016E7
+Durham  1.0153890209999988E7
+Fremont 1.0053242359999955E7
+Fresno  9976260.260000044
+Irvine  1.0084867449999917E7
+Jacksonville    1.0072003330000045E7
+Laredo  1.014460497999991E7
+Long Beach  1.0006380250000054E7
+Madison 1.0032035539999941E7
+Miami   9947316.070000034
+New York    1.0085293549999993E7
+Norfolk 1.0088563169999903E7
+North Las Vegas 1.002965250999993E7
+Orlando 1.0074922520000027E7
 ....
 ```
 
@@ -168,16 +170,16 @@ Im `cleanup` des Reducers werden dann die 10 Einträge aus dem `PriorityQueue` e
 Ausgabe der Top 10 Umsatzstärksten Filialen.
 
 ```
-Philadelphia    1.0190080259999974E7
-Durham          1.0153890209999964E7
-Laredo          1.0144604979999987E7
-Newark          1.0144052800000045E7
-Cincinnati      1.013950574000003E7
-Washington      1.0139363390000047E7
-Irving          1.013394408000006E7
-Fort Wayne      1.0132594020000007E7
-Baton Rouge     1.0131273230000045E7
-Sacramento      1.012346817999993E7
+Philadelphia    10'190'080.26
+Durham  10'153'890.21
+Laredo  10'144'604.98
+Newark  10'144'052.80
+Cincinnati  10'139'505.74
+Washington  10'139'363.39
+Irving  10'133'944.08
+Fort Wayne  10'132'594.02
+Baton Rouge 10'131'273.23
+Sacramento  10'123'468.18
 ```
 
 ### Source Code Beider Programme
