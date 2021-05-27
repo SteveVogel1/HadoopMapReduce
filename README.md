@@ -101,7 +101,7 @@ https://intellipaat.com/community/43196/how-do-i-implement-a-custom-partitioner-
 
 ### Program I (GroupByUmsatz_1.java)
 #### Verarbeitung Inputdatei
-Ähnlich wie in der vorherigen Aufgabe werden auch hier die Zeilen zuerst einzeln der `map` Funktion von `MyMapper` übergeben. Dort wird wieder auf das Tabulator Zeichen `\t` gesplittet. 
+Ähnlich wie in der vorherigen Aufgabe werden auch hier die Zeilen zuerst einzeln der `map` Funktion von `UmsatzMapper` übergeben. Dort wird wieder auf das Tabulator Zeichen `\t` gesplittet. 
 Es werden Store (an dritter Stelle stehend) und der Preis (an fünfter Stellle stehend) extrahiert.
 
 #### Output Map Funktion
