@@ -162,7 +162,7 @@ Gibt in der `cleanUp` Funktion die 10 umsatzstärksten Filialen zurück.
 
 #### Reduce Funktion
 
-Da es bei grossen Eingabedateien mehrere Mappers geben kann, reicht es nicht nur im Mapper zu sortieren und die 10 besten weiterzugeben. Gibt es mehrere Mappers könnte es passieren, dass wir am Schluss mehr als 10 Filialen. Der `RankingReducer` übernimmt also die Aufgabe, aus allen Mappers die 10 besten Fililane auszuwählen. Hierbei wird wieder auf das gleiche Konzept mit der `PriorityQueue` gesetzt wie beim Mapper.
+Da es bei grossen Eingabedateien mehrere Mappers geben kann, reicht es nicht nur im Mapper zu sortieren und die 10 besten weiterzugeben. Gibt es mehrere Mappers könnte es passieren, dass wir am Schluss mehr als 10 Filialen haben. Der `RankingReducer` übernimmt also die Aufgabe, aus allen Mappers die 10 besten Filiale auszuwählen. Hierbei wird wieder auf das gleiche Konzept mit der `PriorityQueue` gesetzt wie beim Mapper.
 
 Im `cleanup` des Reducers werden dann die 10 Einträge aus dem `PriorityQueue` extrahiert und sortiert ausgegeben. Dabei wird der Betrag auch noch schön formatiert.
 
