@@ -120,24 +120,24 @@ Die `reduce` Funktion summiert pro Key die einzelnen Preise auf.
 #### Auszug Ausgabe (Formatiert)
 Ausgabe aller Umsätze pro Filiale.  
 ```
-Anaheim 1.007641635999996E7
-Buffalo 1.0001941190000031E7
-Chandler    9919559.860000001
+Anaheim             1.007641635999996E7
+Buffalo             1.0001941190000031E7
+Chandler            9919559.860000001
 Colorado Springs    1.0061105870000025E7
-Dallas  1.0066548450000016E7
-Durham  1.0153890209999988E7
-Fremont 1.0053242359999955E7
-Fresno  9976260.260000044
-Irvine  1.0084867449999917E7
-Jacksonville    1.0072003330000045E7
-Laredo  1.014460497999991E7
-Long Beach  1.0006380250000054E7
-Madison 1.0032035539999941E7
-Miami   9947316.070000034
-New York    1.0085293549999993E7
-Norfolk 1.0088563169999903E7
-North Las Vegas 1.002965250999993E7
-Orlando 1.0074922520000027E7
+Dallas              1.0066548450000016E7
+Durham              1.0153890209999988E7
+Fremont             1.0053242359999955E7
+Fresno              9976260.260000044
+Irvine              1.0084867449999917E7
+Jacksonville        1.0072003330000045E7
+Laredo              1.014460497999991E7
+Long Beach          1.0006380250000054E7
+Madison             1.0032035539999941E7
+Miami               9947316.070000034
+New York            1.0085293549999993E7
+Norfolk             1.0088563169999903E7
+North Las Vegas     1.002965250999993E7
+Orlando             1.0074922520000027E7
 ....
 ```
 
@@ -171,15 +171,15 @@ Ausgabe der Top 10 Umsatzstärksten Filialen.
 
 ```
 Philadelphia    10'190'080.26
-Durham  10'153'890.21
-Laredo  10'144'604.98
-Newark  10'144'052.80
-Cincinnati  10'139'505.74
-Washington  10'139'363.39
-Irving  10'133'944.08
-Fort Wayne  10'132'594.02
-Baton Rouge 10'131'273.23
-Sacramento  10'123'468.18
+Durham          10'153'890.21
+Laredo          10'144'604.98
+Newark          10'144'052.80
+Cincinnati      10'139'505.74
+Washington      10'139'363.39
+Irving          10'133'944.08
+Fort Wayne      10'132'594.02
+Baton Rouge     10'131'273.23
+Sacramento      10'123'468.18
 ```
 
 ### Source Code Beider Programme
