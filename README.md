@@ -51,16 +51,16 @@ Auch der Betrag wird nach selbem Vorgehen extrahiert und in ein `Double` umgewan
 
 Die Ausgabe der Map-Funktion ist ein Key-Value-Pair für jede Textzeile:
 
-* __Key__\<`LongWritable`\>: Stunde extrahiert aus der Zeit
-* __Value__\<`DoubleWritable`\>: Betrag des Einkaufs
+* **Key**\<`LongWritable`\>: Stunde extrahiert aus der Zeit
+* **Value**\<`DoubleWritable`\>: Betrag des Einkaufs
 
 ### Reduce Funktion
 
 Die Reduce Funktion summiert alle Beträge derselben Stunde auf und berechnet damit den durchschnittlichen Einkaufsbetrag.
 Ausgabe der Reduce Funktion ist folgendes Key-Value-Pair:
 
-* __Key__\<`CustomLongWritable`\>: Stunde
-* __Value__\<`Double`\>: Durchschnitts-Einkaufsbetrag 
+* **Key**\<`CustomLongWritable`\>: Stunde
+* **Value**\<`Double`\>: Durchschnitts-Einkaufsbetrag 
 
 `CustomLongWritable` ist eine Subklasse von `LongWritable` und überschreibt die `toString` Methode. So können wir nicht nur X für die Stunde sondern auch noch ein Label ausgeben.
 
@@ -93,6 +93,10 @@ Aus der obigen Ausgabe kann man keinen Zusammenhang zwischen Stunde und Betrag e
 
 <a href="./code/Verkaufsanalyse.java">Quellcode Verkaufsanalyse.java</a>
 
+### Quellen
+
+https://intellipaat.com/community/43196/how-do-i-implement-a-custom-partitioner-for-a-hadoop-job
+
 ## Aufgabe 2: Die 10 umsatzstärksten Verkaufsläden
 
 ### Program I (GroupByUmsatz_1.java)
@@ -104,14 +108,14 @@ Es werden Store (an dritter Stelle stehend) und der Preis (an fünfter Stellle s
 Als Output der `map` Funktion bilden die Preise pro Filiale ein Key-Value-Pair.
 Hierbei handelt es sich immer noch um einen einzelnen Einkauf (Zeile in der Inputdatei)
 
-* __Key__\<`Text`\>: Name der Filiale
-* __Value__\<`DoubleWritable`\>: Einkaufspreis
+* **Key**\<`Text`\>: Name der Filiale
+* **Value**\<`DoubleWritable`\>: Einkaufspreis
 
 #### Reduce Funktion
 Die `reduce` Funktion summiert pro einzigartigen Key die einzelnen Preise auf.
 
-* __Key__\<`Text`\>: Name der Filiale
-* __Value__\<`DoubleWritable`\>: Summierte Preise über alle Einkäufe hinweg.
+* **Key**\<`Text`\>: Name der Filiale
+* **Value**\<`DoubleWritable`\>: Summierte Preise über alle Einkäufe hinweg.
 
 Diese werden so über den `Context` geschrieben.  
 > TODO kann man das so sagen?
@@ -238,9 +242,9 @@ Jede Zeile wird dann wieder auf `\t` gesplittet und die Filiale und Umsatz pro F
 #### Output Map Funktion
 Die 10 Umsatzstärksten Filialen über alle Filialen hinweg.
 
-* __Key__\<`Text`\>: Name der Filiale
-* __Value__\<`DoubleWritable`\>: Summierte Preise über alle Einkäufe hinweg.
-* __Filtered__: 10 Umsatzstärksten Filialen
+* **Key**\<`Text`\>: Name der Filiale
+* **Value**\<`DoubleWritable`\>: Summierte Preise über alle Einkäufe hinweg.
+* **Filtered**: 10 Umsatzstärksten Filialen
 
 Im `cleanup` des `MyMappers` werden alle verbleibenden Keys nach Umsatz sortiert über den `Context` geschreiben.
 
@@ -272,15 +276,17 @@ Sacramento      1.012346817999993E7
 
 https://www.geeksforgeeks.org/how-to-find-top-n-records-using-mapreduce/
 
+https://data-flair.training/forums/topic/how-to-calculate-number-of-mappers-in-hadoop/
+
 ## Testing
 
 Um frühzeitig eventuelle Fehler entdecken zu können, haben wir vorgängig die erwarteten Werte
 innerhalb eines Jupyter Notebooks mittels `Pandas` ermittelt. Die erhaltenen Resultate stimmen mit dem obigen überein. 
 
-__Resultate der Aufgabe 1__  
+**Resultate der Aufgabe 1**  
 ![Verkaufsanalyse.png](./images/Verkaufsanalyse.png)
 
-__Resultate der Aufgabe 2__  
+**Resultate der Aufgabe 2**  
 ![Verkaufsanalyse.png](./images/UmsatzRanking.png)
 
 
