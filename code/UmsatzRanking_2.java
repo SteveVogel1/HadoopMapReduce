@@ -28,12 +28,13 @@ public class UmsatzRanking_2 extends Configured implements Tool {
 
 	@Override
 	public int run(String[] args) throws Exception {
-		if (args.length != 2) {
+		if (args.length != 2) 
+        {
 			System.err.printf("Usage: %s [generic options] <in> <out>\n", getClass().getSimpleName());
 			ToolRunner.printGenericCommandUsage(System.err);
 			return -1;
-
 		}
+        
 		Job job = Job.getInstance(getConf(), "minimapredext");
 		job.setJarByClass(this.getClass());
 
@@ -43,8 +44,9 @@ public class UmsatzRanking_2 extends Configured implements Tool {
 		job.setMapOutputValueClass(DoubleWritable.class);
 
 		job.setPartitionerClass(HashPartitioner.class);
-
-		job.setNumReduceTasks(0);
+        
+		job.setNumReduceTasks(1);
+		job.setReducerClass(MyReducer.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(DoubleWritable.class);
@@ -56,14 +58,72 @@ public class UmsatzRanking_2 extends Configured implements Tool {
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
 
+    public static class StoreRevenuePair implements Comparable<StoreRevenuePair> {
+        public final String store;
+        public final Double revenue;
+            
+        public StoreRevenuePair(Double revenue, String store){
+            this.store = store;
+            this.revenue = revenue;
+        }
+
+
+        @Override
+        public int compareTo(StoreRevenuePair other){
+            double diff = this.revenue - other.revenue;
+            if(diff < 0)
+            {
+                return -1;
+            } 
+            else if(diff > 0) 
+            {
+                return 1;
+            } else 
+            {
+                return 0;
+            }
+        }
+        
+        @Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((revenue == null) ? 0 : revenue.hashCode());
+			result = prime * result + ((store == null) ? 0 : store.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			StoreRevenuePair other = (StoreRevenuePair) obj;
+			if (revenue == null) {
+				if (other.revenue != null)
+					return false;
+			} else if (!revenue.equals(other.revenue))
+				return false;
+			if (store == null) {
+				if (other.store != null)
+					return false;
+			} else if (!store.equals(other.store))
+				return false;
+			return true;
+		}
+    }
+
 	public static class MyMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
 
-		private TreeMap<Double, String> tmap;
+		private PriorityQueue<StoreRevenuePair> intermediateRanking;
 	
 		@Override
 		public void setup(Context context) throws IOException, InterruptedException
 		{
-			tmap = new TreeMap<Double, String>(Collections.reverseOrder());
+			intermediateRanking = new PriorityQueue<StoreRevenuePair>();
 		}
 	
 		@Override
@@ -73,23 +133,60 @@ public class UmsatzRanking_2 extends Configured implements Tool {
 			String store = tokens[0];
 			double revenue = Double.parseDouble(tokens[1]);
 	
-			tmap.put(revenue, store);
+			intermediateRanking.add(new StoreRevenuePair(revenue, store));
 
-			if (tmap.size() > 10)
+			if (intermediateRanking.size() > 10)
 			{
-				tmap.remove(tmap.lastKey());
+				intermediateRanking.poll();
 			}
 		}
 	
 		@Override
 		public void cleanup(Context context) throws IOException, InterruptedException
 		{
-			for (Map.Entry<Double, String> entry : tmap.entrySet()) 
+            while(!intermediateRanking.isEmpty())
+            {
+                StoreRevenuePair el2 = intermediateRanking.poll();
+				context.write(new Text(el2.store), new DoubleWritable(el2.revenue));
+            }
+		}
+	}
+    
+    public static class MyReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+       private PriorityQueue<StoreRevenuePair> ranking;
+	
+		@Override
+		public void setup(Context context) throws IOException, InterruptedException
+		{
+			ranking = new PriorityQueue<StoreRevenuePair>();
+		}
+	
+		@Override
+		public void reduce(Text key, Iterable<DoubleWritable> value, Context context) throws IOException, InterruptedException
+		{
+            for(DoubleWritable w : value){
+                ranking.add(new StoreRevenuePair(w.get(), key.toString()));
+            }
+
+			if (ranking.size() > 10)
 			{
-				double revenue = entry.getKey();
-				String store = entry.getValue();
-				context.write(new Text(store), new DoubleWritable(revenue));
+				ranking.poll();
 			}
+		}
+	
+		@Override
+		public void cleanup(Context context) throws IOException, InterruptedException
+		{
+            ArrayList<StoreRevenuePair> reversed = new ArrayList<StoreRevenuePair>();
+			while(!ranking.isEmpty())
+            {
+				reversed.add(ranking.poll());
+            }
+            
+            for(int i = reversed.size() - 1; i >= 0; i--)
+            {
+                context.write(new Text(reversed.get(i).store), new DoubleWritable(reversed.get(i).revenue));
+            }
 		}
 	}
 

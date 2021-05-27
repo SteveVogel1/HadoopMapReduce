@@ -268,7 +268,9 @@ Sacramento      1.012346817999993E7
 <a href="./code/GroupByUmsatz_1.java">Quellcode Code GroupByUmsatz_1.java</a>  
 <a href="./code/UmsatzRanking_2.java">Quellcode Code UmsatzRanking_2.java</a>
 
-> TODO Wie ist das mit den Quelle gedacht?
+### Quellen
+
+https://www.geeksforgeeks.org/how-to-find-top-n-records-using-mapreduce/
 
 ## Testing
 
