@@ -10,7 +10,6 @@ table {
     border-left: 1px solid black;
     border-right:1px solid black; 
 }
-
 table td, table th {
     border: 1px solid black !important;
 }
@@ -23,7 +22,6 @@ h2, h3, h4, h5, h6 {
     border-bottom: 0.2em solid var(--black) !important;
     padding: .5em 0.5em 0 0.5em;
 }
-
 blockquote {
     margin: 1em 0;
     border-left:0;
@@ -36,6 +34,9 @@ blockquote {
     );
 }
 </style>
+
+
+
 # Hadoop - MapReduce
 
 ## Team
