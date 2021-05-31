@@ -5,7 +5,6 @@
     --blacka:     rgba(0, 0, 0, .1);
     --fhyellowa : rgba(252, 229, 55, .45);
 }
-
 table {
     margin-left: 0 !important;
     border-left: 1px solid black;
@@ -37,14 +36,20 @@ blockquote {
     );
 }
 </style>
+# Hadoop - MapReduce
 
-# HadoopMapReduce
+## Team
+
+* Marc Sieber
+* Steve Vogel
+* Samuel Keusch
+* Kevin Buman
 
 ## Aufgabe 1: Verkaufsanalyse (Verkaufsanalyse.java)
 
 ### Verarbeitung Inputdatei
 
-Die Map Funktion wird für jede Zeile aufgerufen. Die Zeile wird dann anhand von Tabulator-Zeichen aufgetrennt. Die Zeit ist dabei der 2. Wert (im Array der Werte der Zeile). Die Zeit wird danach anhand des `:` (Doppelpunkts) aufgetrennt und anschliessend wird die Stunde in ein `Long` umgewandelt.
+Die Map Funktion wird für jede Zeile aufgerufen. Die Zeile wird dann anhand von Tabulator-Zeichen aufgetrennt. Die Zeit ist dabei der 2. Wert (im Array der getrennten Werte). Die Zeit wird anhand des `:` (Doppelpunkts) aufgetrennt und anschliessend wird die Stunde in ein `Long` umgewandelt.
 Auch der Betrag wird nach selbem Vorgehen extrahiert und in ein `Double` umgewandelt.
 
 ### Output Map Funktion
@@ -56,13 +61,15 @@ Die Ausgabe der Map-Funktion ist ein Key-Value-Pair für jede Textzeile:
 
 ### Reduce Funktion
 
-Die Reduce Funktion summiert alle Beträge derselben Stunde auf und berechnet damit den durchschnittlichen Einkaufsbetrag.
-Ausgabe der Reduce Funktion ist folgendes Key-Value-Pair:
+Die Reduce Funktion summiert alle Beträge derselben Stunde (also derselben Keys) auf und berechnet damit den durchschnittlichen Einkaufsbetrag.
+Die Ausgabe der Reduce Funktion ist folgendes Key-Value-Pair:
 
 * **Key**\<`CustomLongWritable`\>: Stunde
-* **Value**\<`Double`\>: Durchschnitts-Einkaufsbetrag 
+* **Value**\<`Double`\>: Durchschnittlicher Einkaufsbetrag 
 
-`CustomLongWritable` ist eine Subklasse von `LongWritable` und überschreibt die `toString` Methode. So können wir nicht nur X für die Stunde sondern auch noch ein Label ausgeben.
+`CustomLongWritable` ist eine Subklasse von `LongWritable` und überschreibt die `toString` Methode. Damit können wir die Form des Outputs beeinflussen.
+
+<div style="page-break-after: always; break-after: page;"></div>
 
 ### CustomPartitioner
 
@@ -73,7 +80,7 @@ Die Funktion für das Berechnen, an welche Partition ein Key hinzugewiesen wird,
 
 Die könnte man natürlich auch noch nachträglich beheben in dem man die Textdateien z.B. mit Commandlinetools sortiert.
 
-### Auszug Ausgabe (alle Dateien konkateniert)
+### Auszug aus dem Output der Aufgabe 1 (alle Dateien konkateniert)
 
 ```
 Stunde: 9       249.67
@@ -87,38 +94,38 @@ Stunde: 16      250.24
 Stunde: 17      249.74
 ```
 
-Aus der obigen Ausgabe kann man keinen Zusammenhang zwischen Stunde und Betrag ermitteln, da sich der minimale und maximale Betrag keine 60 Rp. unterscheiden.  
+Aus der obigen Ausgabe kann man keinen nennenswerten Zusammenhang zwischen Stunde und Betrag ermitteln, da sich minimaler und maximaler Wert um weniger als 60 Rappen unterscheiden.  
 
 ### Source Code
 
-<a href="./code/Verkaufsanalyse.java">Quellcode Verkaufsanalyse.java</a>
+[Verkaufsanalyse.java](https://github.com/SteveVogel1/HadoopMapReduce/blob/main/code/Verkaufsanalyse.java)
 
 ### Quellen
 
 https://intellipaat.com/community/43196/how-do-i-implement-a-custom-partitioner-for-a-hadoop-job
 
+<div style="page-break-after: always; break-after: page;"></div>
+
 ## Aufgabe 2: Die 10 umsatzstärksten Verkaufsläden
 
-### Program I (GroupByUmsatz_1.java)
+### Programm I (GroupByUmsatz_1.java)
 #### Verarbeitung Inputdatei
-Ähnlich wie in der vorherigen Aufgabe werden auch hier die Zeilen zuerst einzeln der `map` Funktion von `UmsatzMapper` übergeben. Dort wird wieder auf das Tabulator Zeichen `\t` gesplittet. 
-Es werden Store (an dritter Stelle stehend) und der Preis (an fünfter Stellle stehend) extrahiert.
+Ähnlich wie in der vorherigen Aufgabe werden auch hier die Zeilen zuerst einzeln der `map` Funktion von `UmsatzMapper` übergeben. Dort wird wieder auf das Tabulator Zeichen `\t` gesplittet.  Es werden Store (an dritter Stelle stehend) und der Preis (an fünfter Stellle stehend) extrahiert.
 
 #### Output Map Funktion
-Als Output der `map` Funktion bilden die Preise pro Filiale ein Key-Value-Pair.
-Hierbei handelt es sich immer noch um einen einzelnen Einkauf (Zeile in der Inputdatei)
+Als Output der `map` Funktion bilden die Preise pro Filiale ein Key-Value-Pair. Hierbei handelt es sich immer noch um einen einzelnen Einkauf (Zeile in der Inputdatei)
 
 * **Key**\<`Text`\>: Name der Filiale
 * **Value**\<`DoubleWritable`\>: Einkaufspreis
 
 #### Reduce Funktion
-Die `reduce` Funktion summiert pro Key die einzelnen Preise auf.
+Die `reduce` Funktion summiert pro Key die Beträge auf. Der Output hat folgende Form:
 
 * **Key**\<`Text`\>: Name der Filiale
 * **Value**\<`DoubleWritable`\>: Summierte Preise über alle Einkäufe hinweg.
 
-#### Auszug Ausgabe (Formatiert)
-Ausgabe aller Umsätze pro Filiale.  
+#### Auszug Output (Formatiert)
+Ausgabe aller Umsätze pro Filiale. 
 ```
 Anaheim             1.007641635999996E7
 Buffalo             1.0001941190000031E7
@@ -141,16 +148,12 @@ Orlando             1.0074922520000027E7
 ....
 ```
 
+<div style="page-break-after: always; break-after: page;"></div>
+
 ### Program II (UmsatzRanking_2.java)
 
 #### Verarbeitung Inputdatei
-Als Input wird nun der Output des vorhergehenden Programms verwendet.
-
-In der `RankingMapper` Klasse wird eine `PriorityQueue<StoreRevenuePair>` verwaltet.
-Auch hier werden die Zeilen wieder einzeln eingelesen und der `map` Funktion von `RankingMapper` übergeben.  
-Jede Zeile wird dann wieder auf `\t` gesplittet und die Filiale und Umsatz pro Filiale wird in einer `PriorityQueue` gespeichert. Die Intention ist, dass in der `PriorityQueue` für diesen Mapper die 10 umsatzstärken Filialen gespeichert werden.
-
-Sobald die `PriorityQueue` eine Grösse von 10 überschreitet, wird jeweils der letzte Key gelöscht. In der `cleanup` Funktion des Reducers werden dann die 10 umsatzstärksten Filialen mit `Context.write` geschrieben.
+Als Input wird nun der Output des vorhergehenden Programms verwendet. In der Klasse `RankingMapper` wird eine `PriorityQueue<StoreRevenuePair>` verwaltet. Auch hier werden die Zeilen wieder einzeln eingelesen und der `map` Funktion von `RankingMapper` übergeben.  Jede Zeile wird dann wieder auf `\t` gesplittet und die Filiale und Umsatz pro Filiale wird in einer `PriorityQueue` gespeichert. Die Intention ist, dass in der `PriorityQueue` für diesen Mapper die 10 umsatzstärken Filialen gespeichert werden. Sobald die `PriorityQueue` eine Grösse von 10 überschreitet, wird jeweils der letzte Key gelöscht. In der `cleanup` Funktion des Reducers werden dann die 10 umsatzstärksten Filialen mit `Context.write` geschrieben.
 
 #### Output Map Funktion
 
@@ -164,9 +167,9 @@ Gibt in der `cleanUp` Funktion die 10 umsatzstärksten Filialen zurück.
 
 Da es bei grossen Eingabedateien mehrere Mappers geben kann, reicht es nicht nur im Mapper zu sortieren und die 10 besten weiterzugeben. Gibt es mehrere Mappers könnte es passieren, dass wir am Schluss mehr als 10 Filialen haben. Der `RankingReducer` übernimmt also die Aufgabe, aus allen Mappers die 10 besten Filiale auszuwählen. Hierbei wird wieder auf das gleiche Konzept mit der `PriorityQueue` gesetzt wie beim Mapper.
 
-Im `cleanup` des Reducers werden dann die 10 Einträge aus dem `PriorityQueue` extrahiert und sortiert ausgegeben. Dabei wird der Betrag auch noch schön formatiert.
+Im `cleanup` des Reducers werden dann die 10 Einträge aus dem `PriorityQueue` extrahiert und sortiert ausgegeben. Dabei wird der Betrag auch noch entsprechend formatiert.
 
-#### Auszug Ausgabe (Formatiert)
+#### Auszug Output (Formatiert)
 Ausgabe der Top 10 Umsatzstärksten Filialen.
 
 ```
@@ -182,29 +185,32 @@ Baton Rouge     10'131'273.23
 Sacramento      10'123'468.18
 ```
 
-### Source Code Beider Programme
+### Source Code
 
-<a href="./code/GroupByUmsatz_1.java">Quellcode Code GroupByUmsatz_1.java</a>  
-<a href="./code/UmsatzRanking_2.java">Quellcode Code UmsatzRanking_2.java</a>
+[GroupByUmsatz_1.java](https://github.com/SteveVogel1/HadoopMapReduce/blob/main/code/GroupByUmsatz_1.java)
+[UmsatzRanking_2.java](https://github.com/SteveVogel1/HadoopMapReduce/blob/main/code/UmsatzRanking_2.java)
 
 ### Quellen
 
 https://www.geeksforgeeks.org/how-to-find-top-n-records-using-mapreduce/
-
 https://data-flair.training/forums/topic/how-to-calculate-number-of-mappers-in-hadoop/
 
-## Testing
+<div style="page-break-after: always; break-after: page;"></div>
 
-Um frühzeitig eventuelle Fehler entdecken zu können, haben wir vorgängig die erwarteten Werte
-innerhalb eines Jupyter Notebooks mittels `Pandas` ermittelt. Die erhaltenen Resultate stimmen mit dem obigen überein. 
+## Validierung der Resultate
 
-**Resultate der Aufgabe 1**  
+Um frühzeitig eventuelle Fehler entdecken zu können, haben wir vorgängig die erwarteten Werte innerhalb eines Jupyter Notebooks mittels `Pandas` ermittelt. Die erhaltenen Resultate stimmen mit dem obigen überein. 
+
+### **Resultate der Aufgabe 1** 
+
 ![Verkaufsanalyse.png](./images/Verkaufsanalyse.png)
 
-**Resultate der Aufgabe 2**  
+### **Resultate der Aufgabe 2** 
+
 ![Verkaufsanalyse.png](./images/UmsatzRanking.png)
 
 
-### Source Code Beider Programme
+### Source Code
 
-<a href="./code/purchases analysis.ipynb">Quellcode Code Jupyter Notebook - purchases analysis.ipynb</a>
+[purchases analysis.ipynb](https://github.com/SteveVogel1/HadoopMapReduce/blob/main/code/purchases%20analysis.ipynb)
+
